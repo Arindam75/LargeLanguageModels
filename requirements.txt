@@ -1,0 +1,17 @@
+openai
+langchain
+streamlit
+PyPDF2
+faiss-cpu
+tiktoken
+sentence-transformers
+pypdf
+chainlit
+sagemaker
+boto3
+transformers
+bitsandbytes
+accelerate
+chromadb
+peft
+llama-index 
