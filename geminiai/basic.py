@@ -8,6 +8,7 @@ import google.generativeai as genai
 genai.configure(api_key = os.getenv("GOOGLE_API_KEY"))
 
 ##Function to load Gemini Pro model and get repsonses
+##https://www.youtube.com/playlist?list=PLZoTAELRMXVNbDmGZlcgCA3a8mRQp5axb 
 
 model = genai.GenerativeModel("gemini-pro")
 def get_gemini_response(question):
