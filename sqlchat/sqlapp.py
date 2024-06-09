@@ -10,7 +10,12 @@ import streamlit as st
 import os
 
 load_dotenv()
-api_key = os.getenv("OPENAI_API_KEY")
+#api_key = os.getenv("OPENAI_API_KEY")
+
+os.environ["OPENAI_API_KEY"]=os.getenv("OPENAI_API_KEY")
+os.environ["LANGCHAIN_TRACING_V2"]="true"
+os.environ["LANGCHAIN_API_KEY"]=os.getenv("LANGCHAIN_API_KEY")
+
 
 ##  langchain api https://api.python.langchain.com/
 ##  video link https://www.youtube.com/watch?v=YqqRkuizNN4&t=11s
@@ -60,29 +65,31 @@ def get_sql_chain(db):
 
 def get_response(user_query, db: SQLDatabase, chat_history: list):
     sql_chain = get_sql_chain(db)
-
+    
     template =  """
     You are a data analyst at a company. You are interacting with a user, asking question about the company's database.
     Based on the table schema below , question, sql query and sql reponse, write a natural language response.
     <SCHEMA>{schema}</SCHEMA>
 
     Conversation History:{chat_history}
-    SQL Query: <SQL>{sql_query}</SQL>
+    SQL Query: <SQL>{query}</SQL>
     User Question: {question}
     SQL Response: {response}
     """
 
+
     prompt = ChatPromptTemplate.from_template(template)
     llm = ChatOpenAI(model = "gpt-4-0125-preview")
 
-    chain = (RunnablePassthrough.assign(query = sql_chain).assign(
+    chain = (
+        RunnablePassthrough.assign(query =  sql_chain).assign(
         schema = lambda _:db.get_table_info(),
         response = lambda vars: db.run(vars["query"])
-    )
-    | prompt
-    | llm
-    | StrOutputParser()
-    )
+        )
+        | prompt
+        | llm
+        | StrOutputParser()
+        )
 
     return chain.invoke({
         "question": user_query,
@@ -139,12 +146,7 @@ if user_query is not None and user_query.strip() != "":
         st.markdown(user_query)
 
     with st.chat_message("AI"):
-        sql_chain = get_sql_chain(st.session_state.db)
-        response = sql_chain.invoke({
-            "chat_history": st.session_state.chat_history,
-            "question": user_query
-
-        })
+        response = get_response(user_query, st.session_state.db, st.session_state.chat_history)
         st.markdown(response)
     
     st.session_state.chat_history.append(AIMessage(content=response))
