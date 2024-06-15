@@ -3,7 +3,12 @@ from langchain_community.utilities import SQLDatabase
 from langchain_core.messages.ai import AIMessage
 from langchain_core.messages.human import HumanMessage
 from langchain_core.prompts import ChatPromptTemplate
+
+#We test the code with either of the two LLMs
 from langchain_community.chat_models import ChatOpenAI
+from langchain_groq.chat_models import ChatGroq
+
+
 from langchain_core.runnables import RunnablePassthrough
 from langchain_core.output_parsers import StrOutputParser
 import streamlit as st
@@ -15,11 +20,13 @@ load_dotenv()
 os.environ["OPENAI_API_KEY"]=os.getenv("OPENAI_API_KEY")
 os.environ["LANGCHAIN_TRACING_V2"]="true"
 os.environ["LANGCHAIN_API_KEY"]=os.getenv("LANGCHAIN_API_KEY")
+os.environ["GROQ_API_KEY"]=os.getenv("GROQ_API_KEY")
 
 
 ##  langchain api https://api.python.langchain.com/
 ##  video link https://www.youtube.com/watch?v=YqqRkuizNN4&t=11s
-##  currently at 40:56
+##  currently at 47:56
+##  Langsmith video https://www.youtube.com/watch?v=3Gcm27l-uyQ
 
 ## Initiate the Database connection when the end user presses
 ## th connect button   
@@ -51,7 +58,8 @@ def get_sql_chain(db):
     """
     prompt = ChatPromptTemplate.from_template(template)
 
-    llm = ChatOpenAI(model = "gpt-4-0125-preview")
+    #llm = ChatOpenAI(model = "gpt-4-0125-preview")
+    llm = ChatGroq(model = 'mixtral-8x7b-32768', temperature = 0)
 
     def get_schema(_):
         return db.get_table_info()
@@ -76,10 +84,9 @@ def get_response(user_query, db: SQLDatabase, chat_history: list):
     User Question: {question}
     SQL Response: {response}
     """
-
-
     prompt = ChatPromptTemplate.from_template(template)
-    llm = ChatOpenAI(model = "gpt-4-0125-preview")
+    #llm = ChatOpenAI(model = "gpt-4-0125-preview")
+    llm = ChatGroq(model = 'mixtral-8x7b-32768', temperature = 0)
 
     chain = (
         RunnablePassthrough.assign(query =  sql_chain).assign(

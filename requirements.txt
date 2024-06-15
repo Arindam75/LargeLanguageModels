@@ -11,3 +11,4 @@ chromadb
 sentence-transformers
 mysql-connector-python
 polars
+langchain-groq
