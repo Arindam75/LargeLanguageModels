@@ -3,3 +3,5 @@
 *venv/*
 */car_review_embeddings/*
 *.env
+flan/
+jup_reqs.txt

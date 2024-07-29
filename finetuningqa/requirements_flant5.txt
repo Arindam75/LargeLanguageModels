@@ -1,0 +1,11 @@
+py7zr
+evaluate
+nltk
+absl-py
+rouge_score
+tensorboardX
+datasets
+transformers[torch]
+tokenizers
+sentencepiece
+huggingface_hub
